@@ -1,21 +1,23 @@
 import React, { useState,useRef } from 'react'
 import Header from './Header'
 import { validataFormData } from '../utils/validateFormData';
-import {  createUserWithEmailAndPassword,signInWithEmailAndPassword,updateProfile  } from "firebase/auth";
+import {  createUserWithEmailAndPassword,signInWithEmailAndPassword,updateProfile } from "firebase/auth";
 import {auth} from "../utils/firebase"
-import { useNavigate } from 'react-router-dom';
+
 import { useDispatch } from 'react-redux';
-import {addUser} from "../utils/userSlice"
+import {addUser} from "../utils/userSlice";
+import { USER_AVATAR } from '../utils/constants';
 
 const Login = () => {
     const [isSignInForm,setIsSignInForm] = useState(true);
     const [errorMessage,setErrorMessage]=useState(null);
+   
 
     const email = useRef(null);
     const password=useRef(null);
     const name=useRef(null);
-    const navigate=useNavigate();
     const dispatch=useDispatch();
+   
 
     const handleButtonClick= () => {
       const message=validataFormData(email.current.value,password.current.value);
@@ -27,13 +29,19 @@ const Login = () => {
         createUserWithEmailAndPassword(auth, email.current.value, password.current.value)
         .then((userCredential) => { 
          const user = userCredential.user; 
-         updateProfile(auth.currentUser, {
+         updateProfile(user, {
           displayName:name.current.value,
-          photoURL: "https://imgs.search.brave.com/7Zonynlaa1_jNrC1ilT9G_GSJYdeZ_6fZsURl7OWs-0/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/ZnJlZS1waG90by9i/ZWF1dGlmdWwtYW5p/bWUtY2hhcmFjdGVy/LWNhcnRvb24tc2Nl/bmVfMjMtMjE1MTAz/NTE1NS5qcGc_c2l6/ZT02MjYmZXh0PWpw/Zw"
+          photoURL: USER_AVATAR,
+    
         }).then(() => {
           const {uid,email,displayName,photoURL} = auth.currentUser;
-          dispatch(addUser({uid:uid,email:email,displayName:displayName,photoURL:photoURL}))
-          navigate("/browse")
+          dispatch(addUser({
+            uid:uid,
+            email:email,
+            displayName:displayName,
+            photoURL:photoURL
+          }))
+          console.log("in update",photoURL);
         }).catch((error) => {
            setErrorMessage(error.message);
         });
@@ -43,16 +51,15 @@ const Login = () => {
           const errorCode = error.code;
           const errorMessage = error.message;
           setErrorMessage(errorCode + "-" + errorMessage);
-   
          });
       }else{
 
-        signInWithEmailAndPassword(auth, email.current.value, password.current.value)
+        signInWithEmailAndPassword(auth,
+           email.current.value,
+            password.current.value)
         .then((userCredential) => {
-        const user = userCredential.user;
-        console.log(user);
-        navigate("/browse") 
-        
+        const user = userCredential.user;   
+        console.log("in sing in",user)
     
   })
   .catch((error) => {
@@ -103,11 +110,6 @@ const Login = () => {
 }
 
 export default Login
-
-
-
-
-
 
 
 

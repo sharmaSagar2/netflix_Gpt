@@ -1,20 +1,44 @@
-import React from 'react';
-import { signOut } from "firebase/auth";
+import React, { useEffect } from 'react';
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from '../utils/firebase';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { addUser,removeUser } from '../utils/userSlice';
 
 const Header = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((store) => store.user);
+ // console.log(user);
 
   const handleSignOut = () => {
     signOut(auth).then(() => {
-      navigate("/");
+      
     }).catch((error) => {
       navigate("/error");
     });
   }
+  useEffect(()=>{
+    const unsubscribe=onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const {uid,email,displayName,photoURL} = user;
+        dispatch(addUser({
+          uid:uid,
+          email:email,
+          displayName:displayName,
+          photoURL:photoURL
+        }))
+       navigate("/browse")
+
+      } else {
+        dispatch(removeUser());
+        navigate("/")
+      }
+    });
+//unsubscribe when componet unmounts
+    return ()=>unsubscribe();
+
+  },[])
 
   return (
     <div className='absolute w-screen bg-gradient-to-t from-black z-10 flex justify-between'>
@@ -27,8 +51,8 @@ const Header = () => {
          <div className='flex p-2 items-center'>
          <img 
            className='w-12 h-12 m-2 rounded-lg'
-          src={user?.photoURL}
-          //src="https://imgs.search.brave.com/7Zonynlaa1_jNrC1ilT9G_GSJYdeZ_6fZsURl7OWs-0/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/ZnJlZS1waG90by9i/ZWF1dGlmdWwtYW5p/bWUtY2hhcmFjdGVy/LWNhcnRvb24tc2Nl/bmVfMjMtMjE1MTAz/NTE1NS5qcGc_c2l6/ZT02MjYmZXh0PWpw/Zw"
+          src={user?.photoURL }
+          
            alt="icon"
          />
          <button 
