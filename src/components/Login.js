@@ -1,6 +1,6 @@
 import React, { useState,useRef } from 'react'
 import Header from './Header'
-import { validataFormData } from '../utils/validateFormData';
+import { validateFormData} from '../utils/validateFormData';
 import {  createUserWithEmailAndPassword,signInWithEmailAndPassword,updateProfile } from "firebase/auth";
 import {auth} from "../utils/firebase"
 
@@ -20,7 +20,7 @@ const Login = () => {
    
 
     const handleButtonClick= () => {
-      const message=validataFormData(email.current.value,password.current.value);
+      const message=validateFormData(email.current.value,password.current.value);
       setErrorMessage(message);
       if(message) return ;
       //sign Up and sing In

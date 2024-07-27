@@ -4,11 +4,15 @@ import { auth } from '../utils/firebase';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { addUser,removeUser } from '../utils/userSlice';
+import { toogleGptSearchView } from '../utils/gptSlice';
+import { SUPPORTED_LANGUAGES } from '../utils/constants';
+import { changeLanguage } from '../utils/configSlice';
 
 const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((store) => store.user);
+  const showGptSearch = useSelector((store)=>store.gpt.showGptSearch);
  // console.log(user);
 
   const handleSignOut = () => {
@@ -40,6 +44,14 @@ const Header = () => {
 
   },[])
 
+  const handleGptSearchClik = () => {
+    dispatch(toogleGptSearchView())
+  }
+  const handleLanguageChange = (e) => {
+    dispatch(changeLanguage(e.target.value))
+
+  }
+
   return (
     <div className='absolute w-screen bg-gradient-to-t from-black z-10 flex justify-between'>
       <img 
@@ -49,6 +61,26 @@ const Header = () => {
       />
       {user &&(
          <div className='flex p-2 items-center'>
+          {showGptSearch && (
+  <select
+    className='p-2 m-2 bg-gray-900 text-white'
+    onChange={handleLanguageChange}
+  >
+    {SUPPORTED_LANGUAGES.map(lang => (
+      <option key={lang.identifier} value={lang.identifier}>
+        {lang.name}
+      </option>
+    ))}
+  </select>
+)}
+
+        <button 
+        className="bg-gradient-to-r from-purple-600 via-purple-700 to-purple-900 text-white font-semibold py-2 px-4 rounded-md shadow-lg hover:shadow-xl transition-shadow duration-300 hover:bg-gradient-to-r hover:from-purple-700 hover:via-purple-800 hover:to-purple-900 focus:outline-none focus:ring-2 focus:ring-purple-300"
+        onClick={handleGptSearchClik}
+        >
+  {showGptSearch ? "Homepage" : "Gpt Search"}
+</button>
+
          <img 
            className='w-12 h-12 m-2 rounded-lg'
           src={user?.photoURL }
