@@ -4,7 +4,7 @@ import { options } from "../utils/constants";
 import { addTrailerVideo } from "../utils/moviesSlice";
 
 const useMovieTrailer = (movie_id) => {
-  console.log("in hook",movie_id)
+  
   const dispatch = useDispatch();
 
   const trailerVideo = useSelector((store) => store.movies.trailerVideo);
