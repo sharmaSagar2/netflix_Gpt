@@ -52,7 +52,6 @@ const GptSearchBar = () => {
             }
 
             const data = await response.json();
-            console.log(data.choices[0].message.content);
             const gptMovies=data.choices[0].message.content.split(",");
             const promiseArray= gptMovies.map(movie=>searchMovieTmdb(movie))
             const tmdbResult= await Promise.all(promiseArray);
